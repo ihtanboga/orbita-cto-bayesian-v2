@@ -1,0 +1,104 @@
+{
+  "bias=0.00": {
+    "n_simulations": 500,
+    "n_patients": 50,
+    "n_days": 180,
+    "treatment_effect": {
+      "mean_beta": 0.07783146861864637,
+      "sd_beta": 0.19168967714290502
+    },
+    "recovered_OR": {
+      "mean": 1.1251766844881255,
+      "median": 1.0834025286413609,
+      "sd": 0.3330952500830392,
+      "ci95": [
+        0.600362604923253,
+        1.900941450323004
+      ]
+    },
+    "power": {
+      "pr_significant": 0.536,
+      "pr_or_gt_1": 0.598,
+      "pr_or_gt_1_1": 0.474,
+      "interpretation": "Probability that a 50-patient trial achieves 95% CI excluding 1 (with bias=0.00)"
+    },
+    "angina_free_days": {
+      "mean_difference": 2.9343199999999996,
+      "median_difference": 3.0799999999999983,
+      "sd": 12.57893463444341,
+      "ci95": [
+        -21.785,
+        27.566999999999975
+      ],
+      "interpretation": "Extra angina-free days with PCI vs sham over 180 days"
+    }
+  },
+  "bias=0.05": {
+    "n_simulations": 500,
+    "n_patients": 50,
+    "n_days": 180,
+    "treatment_effect": {
+      "mean_beta": 0.02783146861864637,
+      "sd_beta": 0.19168967714290502
+    },
+    "recovered_OR": {
+      "mean": 1.0755619503574394,
+      "median": 1.0155199133216115,
+      "sd": 0.32528014129576976,
+      "ci95": [
+        0.5569003616847732,
+        1.8664687885168663
+      ]
+    },
+    "power": {
+      "pr_significant": 0.442,
+      "pr_or_gt_1": 0.52,
+      "pr_or_gt_1_1": 0.39,
+      "interpretation": "Probability that a 50-patient trial achieves 95% CI excluding 1 (with bias=0.05)"
+    },
+    "angina_free_days": {
+      "mean_difference": 1.23032,
+      "median_difference": 0.5399999999999991,
+      "sd": 12.593130281927523,
+      "ci95": [
+        -24.50699999999999,
+        26.42299999999999
+      ],
+      "interpretation": "Extra angina-free days with PCI vs sham over 180 days"
+    }
+  },
+  "bias=0.10": {
+    "n_simulations": 500,
+    "n_patients": 50,
+    "n_days": 180,
+    "treatment_effect": {
+      "mean_beta": -0.022168531381353638,
+      "sd_beta": 0.19168967714290502
+    },
+    "recovered_OR": {
+      "mean": 1.0494396059021542,
+      "median": 1.0182970579022639,
+      "sd": 0.31128496667905325,
+      "ci95": [
+        0.570472453518483,
+        1.735909360106095
+      ]
+    },
+    "power": {
+      "pr_significant": 0.45,
+      "pr_or_gt_1": 0.51,
+      "pr_or_gt_1_1": 0.38,
+      "interpretation": "Probability that a 50-patient trial achieves 95% CI excluding 1 (with bias=0.10)"
+    },
+    "angina_free_days": {
+      "mean_difference": 0.07943999999999943,
+      "median_difference": -0.05999999999999517,
+      "sd": 12.570441889066588,
+      "ci95": [
+        -24.279999999999994,
+        23.489999999999988
+      ],
+      "interpretation": "Extra angina-free days with PCI vs sham over 180 days"
+    }
+  }
+}
