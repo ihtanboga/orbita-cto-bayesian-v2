@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What If We Could Preview ORBITA-CTO? — Bayesian Simulation v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root {
+  --bg:#f8fafc; --surface:#fff; --surface2:#f1f5f9;
+  --text:#0f172a; --text2:#475569; --text3:#94a3b8;
+  --blue:#1a56db; --blue-light:#3b82f6; --blue-pale:#dbeafe; --blue-ghost:#eff6ff;
+  --navy:#0c1e3a; --navy2:#132d54;
+  --green:#059669; --green-bg:#ecfdf5;
+  --amber:#d97706; --amber-bg:#fffbeb;
+  --red:#dc2626; --red-bg:#fef2f2;
+  --line:#e2e8f0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+.container{max-width:860px;margin:0 auto;padding:0 24px;}
+
+/* Hero */
+.hero{text-align:center;padding:64px 24px 48px;background:linear-gradient(180deg,#fff 0%,var(--bg) 100%);}
+.hero h1{font-size:36px;font-weight:900;letter-spacing:-1px;color:var(--navy);line-height:1.1;max-width:700px;margin:0 auto;}
+.hero .sub{font-size:16px;color:var(--text2);margin-top:12px;max-width:600px;margin-left:auto;margin-right:auto;}
+.hero-stats{display:flex;justify-content:center;gap:32px;margin-top:32px;flex-wrap:wrap;}
+.hero-stat{text-align:center;}
+.hero-stat .val{font-size:36px;font-weight:900;color:var(--navy);}
+.hero-stat .lab{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;}
+.badge{display:inline-block;padding:6px 16px;background:var(--navy);color:#fff;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;}
+
+/* Sections */
+.section{padding:48px 0;border-top:1px solid var(--line);}
+.section-label{font-size:11px;font-weight:700;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+.section h2{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.section .desc{font-size:14px;color:var(--text2);margin-bottom:24px;max-width:650px;}
+
+/* Cards */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+@media(max-width:640px){.card-grid{grid-template-columns:1fr;}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;transition:box-shadow 0.2s;}
+.card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.06);}
+.card h3{font-size:15px;font-weight:700;margin-bottom:4px;}
+.card p{font-size:13px;color:var(--text2);line-height:1.5;}
+
+/* Tables */
+.comp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
+.comp-table th{text-align:left;padding:10px 14px;background:var(--surface2);color:var(--text2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--line);}
+.comp-table td{padding:10px 14px;border-bottom:1px solid var(--line);}
+.comp-table tr:last-child td{border-bottom:none;}
+.highlight-row{background:var(--blue-ghost);font-weight:700;}
+
+/* Equation */
+.eq-box{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin:20px 0;text-align:center;}
+.eq{font-family:'Courier New',monospace;font-size:18px;color:var(--navy);line-height:1.8;}
+.eq strong{color:var(--blue);}
+
+/* Callout */
+.callout{background:var(--amber-bg);border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:14px 18px;margin:20px 0;font-size:13px;color:#92400e;line-height:1.6;}
+
+/* Big number */
+.big-num{text-align:center;padding:32px;background:var(--surface);border:1px solid var(--line);border-radius:18px;margin:24px 0;}
+.big-num .val{font-size:56px;font-weight:900;color:var(--navy);letter-spacing:-3px;}
+.big-num .label{font-size:13px;color:var(--text2);margin-top:4px;}
+.big-num .sub{font-size:14px;color:var(--text3);margin-top:8px;}
+
+/* Stat row */
+.stat-row{display:flex;gap:16px;margin:20px 0;flex-wrap:wrap;}
+.stat-box{flex:1;min-width:120px;text-align:center;padding:18px 12px;border-radius:14px;border:1px solid var(--line);}
+.stat-box .val{font-size:28px;font-weight:900;line-height:1;}
+.stat-box .lab{font-size:10px;color:var(--text2);margin-top:6px;text-transform:uppercase;letter-spacing:0.3px;}
+
+/* Cascade */
+.cascade{display:flex;align-items:center;gap:6px;margin:24px 0;flex-wrap:nowrap;}
+.cas-step{flex:1;text-align:center;padding:14px 6px;border-radius:14px;border:1px solid var(--line);background:var(--surface);}
+.cas-or{font-size:22px;font-weight:800;}
+.cas-name{font-size:9px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;}
+.cas-prob{font-size:10px;font-weight:700;margin-top:2px;}
+.cas-arrow{color:var(--text3);font-size:16px;flex-shrink:0;}
+
+/* Verdict */
+.verdict{background:var(--navy);color:#fff;border-radius:18px;padding:40px;text-align:center;margin:40px 0;}
+.verdict h2{font-size:24px;font-weight:800;margin-bottom:16px;}
+.verdict p{font-size:15px;color:rgba(255,255,255,0.8);max-width:600px;margin:0 auto 8px;line-height:1.6;}
+.verdict .small{font-size:12px;color:rgba(255,255,255,0.5);margin-top:16px;}
+
+/* Footer */
+.footer{text-align:center;padding:24px;font-size:11px;color:var(--text3);border-top:1px solid var(--line);margin-top:40px;}
+
+/* Chart */
+.chart-wrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin:20px 0;position:relative;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">Bayesian Simulation &bull; Not a Prediction</div>
+  <h1>What If We Could Preview ORBITA-CTO?</h1>
+  <div class="sub">A modular Bayesian simulation predicting the first sham-controlled CTO PCI trial, on the exact metric it will report.</div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val">1.05</div><div class="lab">Predicted Daily OR</div></div>
+    <div class="hero-stat"><div class="val">0.76–1.39</div><div class="lab">95% Credible Interval</div></div>
+    <div class="hero-stat"><div class="val">60%</div><div class="lab">Pr(any benefit)</div></div>
+    <div class="hero-stat"><div class="val">~44%</div><div class="lab">Power at N=50</div></div>
+  </div>
+</div>
+
+<!-- THE MODEL -->
+<div class="section">
+  <div class="section-label">The Model</div>
+  <h2>One Equation, Five Trials</h2>
+  <p class="desc">Every trial's symptom result is decomposed into a real PCI effect, a CTO-specific modifier, and noise. Two binary switches (CTO and sham) turn terms on and off.</p>
+
+  <div class="eq-box">
+    <div class="eq">Daily Transition OR = <strong>&mu;</strong> + <strong>&delta;<sub>open</sub></strong> &times; CTO + <strong>&epsilon;</strong></div>
+  </div>
+
+  <table class="comp-table">
+    <thead><tr><th>Term</th><th>What it captures</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td><strong>&mu;</strong></td><td>True PCI benefit over sham (daily PO scale)</td><td>ORBITA-2 Bayesian PO: &beta;=0.199, SE=0.029</td></tr>
+      <tr><td><strong>&delta;<sub>open</sub></strong></td><td>CTO collateral attenuation + open-label placebo inflation (inseparable)</td><td>EuroCTO, COMET-CTO, DECISION-CTO</td></tr>
+      <tr><td><strong>&epsilon;</strong></td><td>Between-trial heterogeneity</td><td>&tau; ~ HalfNormal(0.10)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Why &delta;<sub>open</sub> instead of separate &delta;<sub>CTO</sub> + bias?</strong> All CTO trials are open-label. The collateral attenuation and placebo inflation are always active together &mdash; inseparable with current data. We report their sum honestly and show bias scenarios below.
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>Cutting Feedback</h3>
+      <p>&mu; is locked to ORBITA-2's posterior. CTO trial data can only update &delta;<sub>open</sub> and &tau;, not the base PCI effect. This prevents noisy open-label data from corrupting the precise sham-controlled anchor.</p>
+    </div>
+    <div class="card">
+      <h3>Uncertainty-Aware Crosswalk</h3>
+      <p>CTO trials reported SAQ angina frequency (0&ndash;100 scale). ORBITA-CTO uses a daily ordinal diary. We bridge them using ORBITA-2 (which measured both), with the conversion uncertainty propagated through the model.</p>
+    </div>
+  </div>
+</div>
+
+<!-- EVIDENCE BASE -->
+<div class="section">
+  <div class="section-label">Evidence Base</div>
+  <h2>The Missing Cell</h2>
+  <p class="desc">ORBITA-CTO is the only combination of sham-controlled + CTO never tested. Our model predicts it from the existing evidence.</p>
+
+  <table class="comp-table">
+    <thead><tr><th>Trial</th><th>Design</th><th>Sham</th><th>SAQ AF Diff</th><th>Mapped Daily OR</th></tr></thead>
+    <tbody>
+      <tr><td>ORBITA-2</td><td>Non-CTO</td><td style="color:var(--green);font-weight:700;">Yes</td><td>+14.4 pts</td><td style="font-weight:700;">1.22 (direct &mdash; anchors &mu;)</td></tr>
+      <tr><td>EuroCTO</td><td>CTO</td><td style="color:var(--red);font-weight:700;">No</td><td>+5.2 pts</td><td style="color:var(--text3);">~1.07 (crosswalk)</td></tr>
+      <tr><td>COMET-CTO</td><td>CTO</td><td style="color:var(--red);font-weight:700;">No</td><td>+13.0 pts</td><td style="color:var(--text3);">~1.20 (crosswalk)</td></tr>
+      <tr><td>DECISION-CTO</td><td>CTO*</td><td style="color:var(--red);font-weight:700;">No</td><td>+0.8 pts</td><td style="color:var(--text3);">~1.01 (crosswalk)</td></tr>
+      <tr class="highlight-row"><td><strong>ORBITA-CTO</strong></td><td><strong>CTO</strong></td><td style="color:var(--green);font-weight:700;"><strong>Yes</strong></td><td><strong>???</strong></td><td style="color:var(--navy);font-weight:800;"><strong>1.05&ndash;1.10</strong></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:11px;color:var(--text3);">*DECISION-CTO: both arms received non-CTO PCI (included with contamination dampening &kappa;). Crosswalk calibrated from ORBITA-2 (&gamma;=0.014).</p>
+</div>
+
+<!-- POSTERIOR DISTRIBUTION -->
+<div class="section">
+  <div class="section-label">Posterior Distribution</div>
+  <h2>60,000 MCMC Samples</h2>
+  <p class="desc">The full posterior predictive distribution for the Day-180 daily transition OR (bias=0.05 assumed).</p>
+
+  <div class="chart-wrap">
+    <div style="position:relative;height:320px;">
+      <canvas id="posteriorChart"></canvas>
+      <div style="position:absolute;top:16px;right:20px;text-align:right;">
+        <div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;">Mean OR</div>
+        <div style="font-size:48px;font-weight:900;color:var(--navy);letter-spacing:-2px;line-height:1;">1.05</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">95% CrI: 0.76 &ndash; 1.40</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:16px;margin-top:8px;font-size:10px;color:var(--text3);">
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(220,38,38,0.35);border-radius:2px;margin-right:3px;vertical-align:middle;"></span>Harm (&lt;0.8)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(217,119,6,0.35);border-radius:2px;margin-right:3px;vertical-align:middle;"></span>Neutral (0.8&ndash;1.0)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(26,86,219,0.45);border-radius:2px;margin-right:3px;vertical-align:middle;"></span>Modest benefit (1.0&ndash;1.5)</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:rgba(5,150,105,0.35);border-radius:2px;margin-right:3px;vertical-align:middle;"></span>Clear benefit (&gt;1.5)</span>
+    </div>
+  </div>
+</div>
+
+<!-- BIAS SCENARIOS -->
+<div class="section">
+  <div class="section-label">Bias Scenarios</div>
+  <h2>What the Sham Control Changes</h2>
+  <p class="desc">&delta;<sub>CTO</sub> and open-label bias are inseparable. We show predictions for different assumed bias levels &mdash; the true answer lies somewhere in this range.</p>
+
+  <table class="comp-table">
+    <thead><tr><th>Open-label bias</th><th>Mean OR</th><th>95% CrI</th><th>Pr(benefit)</th><th>Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td><span style="color:var(--green);font-weight:700;">0.00</span></td><td style="font-weight:700;">1.10</td><td>0.80 &ndash; 1.47</td><td>73%</td><td style="color:var(--text3);">No placebo inflation</td></tr>
+      <tr><td>0.02</td><td>1.08</td><td>0.79 &ndash; 1.44</td><td>69%</td><td></td></tr>
+      <tr class="highlight-row"><td><span style="color:var(--amber);font-weight:700;">0.05</span></td><td style="font-weight:800;">1.05</td><td><strong>0.76 &ndash; 1.39</strong></td><td><strong>60%</strong></td><td style="color:var(--text2);">Most plausible</td></tr>
+      <tr><td>0.08</td><td>1.02</td><td>0.74 &ndash; 1.36</td><td>53%</td><td></td></tr>
+      <tr><td><span style="color:var(--red);font-weight:700;">0.10</span></td><td>1.00</td><td>0.73 &ndash; 1.33</td><td>47%</td><td style="color:var(--text3);">Substantial inflation</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- TRIAL SIMULATION -->
+<div class="section">
+  <div class="section-label">Trial Simulation</div>
+  <h2>What Would a 50-Patient Trial Show?</h2>
+  <p class="desc">We simulated 500 ORBITA-CTO trials (25 PCI + 25 sham, 180-day ordinal angina diary) and re-analyzed each one.</p>
+
+  <table class="comp-table">
+    <thead><tr><th>Bias</th><th>Recovered OR</th><th>Power</th><th>Angina-Free Days Diff</th><th>95% Range</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--green);">0.00</td><td style="font-weight:700;">1.13</td><td style="color:var(--amber);font-weight:700;">54%</td><td>+2.9 days / 6 mo</td><td>&minus;22 to +28</td></tr>
+      <tr class="highlight-row"><td style="color:var(--amber);"><strong>0.05</strong></td><td style="font-weight:700;"><strong>1.08</strong></td><td style="color:var(--red);font-weight:700;"><strong>44%</strong></td><td><strong>+1.2 days / 6 mo</strong></td><td><strong>&minus;25 to +26</strong></td></tr>
+      <tr><td style="color:var(--red);">0.10</td><td style="font-weight:700;">1.05</td><td style="color:var(--red);font-weight:700;">45%</td><td>+0.1 days / 6 mo</td><td>&minus;24 to +24</td></tr>
+    </tbody>
+  </table>
+
+  <div class="stat-row">
+    <div class="stat-box" style="background:var(--red-bg);">
+      <div class="val" style="color:var(--red);">~44%</div>
+      <div class="lab">Power at N=50</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;">Coin-flip odds of significance</div>
+    </div>
+    <div class="stat-box" style="background:var(--amber-bg);">
+      <div class="val" style="color:var(--amber);">~1 day</div>
+      <div class="lab">Extra angina-free days</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;">Over 6 months &mdash; hard to perceive</div>
+    </div>
+  </div>
+</div>
+
+<!-- SENSITIVITY -->
+<div class="section">
+  <div class="section-label">Sensitivity Analysis</div>
+  <h2>How Robust Is This?</h2>
+  <p class="desc">10 scenarios testing every key assumption. All use bias=0.05.</p>
+
+  <table class="comp-table">
+    <thead><tr><th>Scenario</th><th>Mean OR</th><th>95% CrI</th><th>Pr(benefit)</th></tr></thead>
+    <tbody>
+      <tr class="highlight-row"><td><strong>Primary (base case)</strong></td><td style="font-weight:800;">1.05</td><td>0.76 &ndash; 1.39</td><td>60%</td></tr>
+      <tr><td>Vague &delta;<sub>open</sub> prior</td><td>1.07</td><td>0.76 &ndash; 1.47</td><td>64%</td></tr>
+      <tr><td>No CTO attenuation assumed</td><td>1.08</td><td>0.78 &ndash; 1.42</td><td>68%</td></tr>
+      <tr><td>Strong CTO attenuation</td><td style="color:var(--red);">0.99</td><td>0.74 &ndash; 1.26</td><td style="color:var(--red);">44%</td></tr>
+      <tr><td>Wider crosswalk uncertainty</td><td>1.04</td><td>0.75 &ndash; 1.41</td><td>59%</td></tr>
+      <tr><td>Wider between-trial &tau;</td><td>1.05</td><td>0.72 &ndash; 1.46</td><td>61%</td></tr>
+      <tr><td>Without DECISION-CTO</td><td>1.06</td><td>0.77 &ndash; 1.44</td><td>63%</td></tr>
+      <tr><td>ORBITA-2 only (no CTO data)</td><td style="color:var(--text3);">0.98</td><td style="color:var(--text3);">0.31 &ndash; 1.94</td><td style="color:var(--text3);">44%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>Robust:</strong> Mean OR ranges 0.98&ndash;1.08 across all scenarios. The result does not depend on any single assumption &mdash; except when CTO data is entirely removed, where uncertainty explodes.
+  </div>
+</div>
+
+<!-- BOTTOM LINE -->
+<div class="verdict">
+  <h2>Bottom Line</h2>
+  <p>ORBITA-CTO will almost certainly fix the physiology. Whether the patient notices &mdash; that is the question this trial begins to answer.</p>
+  <p>Predicted daily transition OR: <strong>1.05</strong> &nbsp;|&nbsp; ~1 extra angina-free day over 6 months &nbsp;|&nbsp; ~44% power at N=50</p>
+  <p>This is a pilot. It proves feasibility, not efficacy. A powered confirmatory trial would need N&gt;300.</p>
+  <div class="small">Simulation, not prediction. Model is assumption-driven, not identified. Sensitivity range: OR 0.98&ndash;1.08 across 10 scenarios.<br>240K posterior samples, 4 chains, all R-hat &lt; 1.01. Published evidence only &mdash; no insider data.</div>
+</div>
+
+</div><!-- /container -->
+
+<div class="footer">
+  Evidence: ORBITA-2 (NEJM 2023), ORBITA substudies, ORBITA-CTO design (Front Cardiovasc Med 2023), EuroCTO (EHJ 2018), COMET-CTO (Int Heart J 2021), DECISION-CTO (Circ 2019)
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+var hd={counts:[1,1,2,3,9,23,43,112,268,535,1095,1854,2923,4408,5879,6787,7207,6903,5776,4790,3656,2596,1753,1175,724,425,328,203,151,96,67,50,49,34,21,15,13,6,2,4,3,5,1,1,2,1,0,0,0,0],centers:[0.322,0.366,0.41,0.454,0.498,0.542,0.586,0.63,0.674,0.718,0.762,0.806,0.85,0.894,0.938,0.982,1.026,1.07,1.114,1.158,1.202,1.246,1.29,1.334,1.378,1.422,1.466,1.51,1.554,1.598,1.642,1.686,1.73,1.774,1.818,1.862,1.906,1.95,1.994,2.038,2.082,2.126,2.17,2.214,2.258,2.302,2.346,2.39,2.434,2.478]};
+var colors=hd.centers.map(function(v){if(v<0.8)return'rgba(220,38,38,0.35)';if(v<1.0)return'rgba(217,119,6,0.35)';if(v<1.5)return'rgba(26,86,219,0.45)';return'rgba(5,150,105,0.35)';});
+new Chart(document.getElementById('posteriorChart'),{type:'bar',data:{labels:hd.centers.map(function(v){return v.toFixed(2)}),datasets:[{data:hd.counts,backgroundColor:colors,borderWidth:0,barPercentage:1,categoryPercentage:1}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{color:'#94a3b8',font:{size:9},maxTicksLimit:10,callback:function(v,i){var c=parseFloat(hd.centers[i]);if([0.5,0.8,1.0,1.2,1.5,2.0,2.5].indexOf(Math.round(c*10)/10)>=0)return c.toFixed(1);return'';}}},y:{display:false}}},plugins:[{id:'lines',afterDraw:function(ch){var ctx=ch.ctx,xs=ch.scales.x,ys=ch.scales.y;var mi=hd.centers.findIndex(function(c){return c>=1.05});if(mi>=0){var x=xs.getPixelForValue(mi);ctx.save();ctx.strokeStyle='#0c1e3a';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(x,ys.top);ctx.lineTo(x,ys.bottom);ctx.stroke();ctx.restore();}var ni=hd.centers.findIndex(function(c){return c>=1.0});if(ni>=0){var x1=xs.getPixelForValue(ni);ctx.save();ctx.strokeStyle='rgba(220,38,38,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(x1,ys.top);ctx.lineTo(x1,ys.bottom);ctx.stroke();ctx.restore();}}}]});
+</script>
+</body>
+</html>
